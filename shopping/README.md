@@ -6,7 +6,9 @@ S-group: Fill in a form in a customer service desk.
 
 K-group: Fill in a paper and mail it to X.
 
-Both S and K will send you your data in a paper format via mail
+Both S and K will send you your data in a paper format via mail. This makes processing the data much harder but not impossible. In the future the data will hopefully be provided in a convenient machine readable format.
+
+Talouselämä has written about this data [here](http://www.taloussanomat.fi/yrittaja/2012/10/31/bonuskortti-paljastaa-nain-kauppias-arvioi-sinua/201240974/137) and [here](http://www.talouselama.fi/uutiset/yle+sryhma+tietaa+kantaasiakkaistaan+taman++kryhma+tietaa+paljon+enemman/a2173601)
 
 ## How to analyze my shopping data?
 
