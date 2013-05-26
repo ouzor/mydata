@@ -20,11 +20,11 @@ Here's an example workflow that worked for me
 * Use [Tesseract](https://code.google.com/p/tesseract-ocr/) for OCR
   * Tesseract shell scripts: [S-data](S-data_OCR.sh), K-data (coming)
 * Use [R](http://www.r-project.org/) for processing and analysing the data
-  * R scripts: [S-data](), K-data (coming)
+  * R scripts: [S-data](S-data_process.R), K-data (coming)
   
-Here's and example visualization, produced from my S-data
+Here's and example visualization, produced from my S-data with the above script
 
-![S-data_vis](https://github.com/ouzor/mydata/tree/master/shopping/S-data_Events_20130526.png)
+![S-data_vis](https://raw.github.com/ouzor/mydata/master/shopping/S-data_Events_20130526.png)
 
 ## Some details
 
