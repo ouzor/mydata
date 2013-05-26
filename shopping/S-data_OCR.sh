@@ -1,10 +1,12 @@
 #!/bin/bash
+% This script assumes you have a scanned your S-group data into file S-data.pdf
 
+% Create folders for the output
 mkdir TEMP_PDF
 mkdir TEMP_PNG
 mkdir TEMP_TXT
 
-echo "S-data: split, pdfs convert to png, run ocr"
+echo "S-data: split pdfs, convert to png, run ocr"
 for i in {1..31}
 do
   pdftk S-data.pdf cat $i output TEMP_PDF/S-data_split_$i.pdf
