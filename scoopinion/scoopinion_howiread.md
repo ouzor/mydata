@@ -83,9 +83,10 @@ scoop.df$WeekDay <- factor(weekdays(scoop.df$Date), levels = c("Monday", "Tuesda
     "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
 # Add months
 scoop.df$Month <- factor(months(scoop.df$Date), levels = month.name)
+# Add years
+scoop.df$Year <- format(scoop.df$Date, format = "%Y")
 # Add combined year-month information
-scoop.df$Year.Month <- factor(paste(format(scoop.df$Date, format = "%Y"), scoop.df$Month, 
-    sep = " - "))
+scoop.df$Year.Month <- factor(paste(scoop.df$Year, scoop.df$Month, sep = " - "))
 temp.ym <- paste(rep(c("2012", "2013"), each = length(month.name)), month.name, 
     sep = " - ")
 scoop.df$Year.Month <- factor(scoop.df$Year.Month, levels = temp.ym)
@@ -149,20 +150,20 @@ ggplot(scoop.df, aes(x = article.word_count, y = article.average_time, colour = 
     geom_jitter()
 ```
 
-![plot of chunk word_vs_time](http://i.imgur.com/CSRfPgx.png) 
+![plot of chunk word_vs_time](http://i.imgur.com/mw1iQp4.png) 
 
 
 ---
-### Plot reading behaviour over time, split by months
+### Plot reading behaviour over time, split by years
 
 
 ```r
 # Histogram of daily reading counts
 ggplot(scoop.df, aes(x = Date, fill = article.language)) + geom_histogram(position = "stack", 
-    binwidth = 1) + facet_wrap(~Year.Month, ncol = 3, scales = "free_x")
+    binwidth = 1) + facet_wrap(~Year, ncol = 1, scales = "free_x")
 ```
 
-![plot of chunk time](http://i.imgur.com/wDyLtbS.png) 
+![plot of chunk time](http://i.imgur.com/a3Z2NZu.png) 
 
 
 ---
@@ -173,10 +174,10 @@ ggplot(scoop.df, aes(x = Date, fill = article.language)) + geom_histogram(positi
 ```r
 # Histogram of weekday reading counts
 ggplot(scoop.df, aes(x = WeekDay, fill = article.language)) + geom_histogram(position = "stack", 
-    binwidth = 1) + facet_wrap(~Month, ncol = 3) + theme(axis.text.x = element_text(angle = 45, 
+    binwidth = 1) + facet_wrap(~Year.Month, ncol = 5) + theme(axis.text.x = element_text(angle = 45, 
     vjust = 0.8))
 ```
 
-![plot of chunk weekday](http://i.imgur.com/d4bq37f.png) 
+![plot of chunk weekday](http://i.imgur.com/rr7tkIl.png) 
 
 
