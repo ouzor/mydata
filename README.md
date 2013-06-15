@@ -5,7 +5,7 @@ Scripts for processing and analysing various personal data sources with open sou
 
 Currently available scripts
 * [Shopping data](shopping)
-* [Scoopinion reading data](scoopinion)
+* [Scoopinion reading data](scoopinion/scoopinion_howiread.md)
 
 Other mydata sources on my todo list
 * [Heiaheia](http://www.heiaheia.com/) exercise data
