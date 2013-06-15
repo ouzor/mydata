@@ -14,16 +14,7 @@ theme_set(theme_grey(16))
 
 ---
 
-## About
-* Personal [Scoopinion](http://www.scoopinion.com/) data [released](https://www.scoopinion.com/blog/download-your-reading-data) today
-* This report is created with [R](http://www.r-project.org/) and [RStudio](http://rstudio.org/)
- * See the [sourcecode](https://github.com/ouzor/misc/blob/master/scoopinion/howiread_ouzor_20120921.Rmd) in github
- * Uses package [knitr](http://yihui.name/knitr/) for easy markdown reporting
- * Uses package [ggplot2](http://ggplot2.org/) for figures
-
----
-
-### Obtaining the data
+### Reading the data
 
 Read the JSON data file
 
