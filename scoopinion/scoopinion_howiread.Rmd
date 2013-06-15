@@ -1,0 +1,118 @@
+# How I read? - Introduction to Scoopinion reading behavior data with R
+### Juuso Parkkinen - @ouzor
+### 15.6.2012
+
+```{r setup, include=FALSE}
+# upload images to imgur automatically 
+opts_knit$set(upload.fun = imgur_upload)
+
+# Load required libraries
+library(ggplot2)
+theme_set(theme_grey(16))
+
+```
+
+---
+
+## About
+* Personal [Scoopinion](http://www.scoopinion.com/) data [released](https://www.scoopinion.com/blog/download-your-reading-data) today
+* This report is created with [R](http://www.r-project.org/) and [RStudio](http://rstudio.org/)
+ * See the [sourcecode](https://github.com/ouzor/misc/blob/master/scoopinion/howiread_ouzor_20120921.Rmd) in github
+ * Uses package [knitr](http://yihui.name/knitr/) for easy markdown reporting
+ * Uses package [ggplot2](http://ggplot2.org/) for figures
+
+---
+
+### Obtaining the data
+
+Read the JSON data file
+
+```{r read_data, warning=FALSE}
+# Use package 'rjson' to read the data
+library(rjson)
+scoop.raw <- fromJSON(file="myscoopiniondata.json")
+```
+
+See what metadata is given
+
+```{r meta}
+# Check meta data
+scoop.raw$meta
+```
+---
+
+### Preprocessing
+The interesting part is the 'reads' data. Process it into analysable format:
+
+```{r preprocess, warning=FALSE}
+common.items <- c("id", "words_read", "created_at", "article.id", "article.title", "article.url", "article.word_count", "article.average_time", "article.language", "article.site.name", "article.site.id", "article.site.url")
+temp.mat <- sapply(scoop.raw$reads, function(x) {res=unlist(x); return(res[names(res) %in% common.items])})
+# Produce a data frame
+scoop.df <- data.frame(t(temp.mat))
+# Transform some columns to numeric form
+scoop.df[c("words_read", "article.word_count", "article.average_time")] <- sapply(scoop.df[c("words_read", "article.word_count", "article.average_time")], function(x) as.numeric(as.vector(x)))
+# Remove reads with missing data
+scoop.df <- na.omit(scoop.df)
+
+```
+
+R has nice tools for handling Dates, with easy addition of weekday and month information:
+
+```{r date}
+# Add date in a proper format
+scoop.df$Date <- as.Date(sapply(strsplit(as.vector(scoop.df$created_at), split="T"), function(x) x[1]))
+# Add weekdays
+scoop.df$WeekDay <- factor(weekdays(scoop.df$Date), levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+# Add months
+scoop.df$Month <- factor(months(scoop.df$Date), levels=month.name)
+# Add combined year-month information
+scoop.df$Year.Month <- factor(paste(format(scoop.df$Date, format = "%Y"), scoop.df$Month, sep=" - "))
+temp.ym <- paste(rep(c("2012", "2013"), each=length(month.name)), month.name, sep=" - ")
+scoop.df$Year.Month <- factor(scoop.df$Year.Month, levels=temp.ym)
+# Cut away 2013 - April (only one read)
+scoop.df <- droplevels(subset(scoop.df, Year.Month != "2013 - April"))
+```
+
+---
+### Basic stuff
+
+```{r basic}
+# Most commonly read sites
+head(sort(table(scoop.df$article.site.name), decreasing=T), 10)
+
+# Language distribution
+table(scoop.df$article.language)
+
+# Remove rare languages
+scoop.df <- droplevels(subset(scoop.df, article.language %in% c("en", "fi")))
+
+# Top referring sites (currently not included in the anlysis because they are missing from some reads)
+# head(sort(table(scoop.df$referrer), decreasing=T), 5)
+```
+
+
+---
+### Plot word counts against average reading times
+
+```{r word_vs_time, message=FALSE, fig.width=8, fig.heigth=8}
+# Scatter plot of word count vs. average time, colour based on languages
+ggplot(scoop.df, aes(x=article.word_count, y=article.average_time, colour=article.language)) + geom_jitter()
+```
+
+---
+### Plot reading behaviour over time, split by months
+
+```{r time, fig.width=8, fig.height=6}
+# Histogram of daily reading counts
+ggplot(scoop.df, aes(x=Date, fill=article.language)) + geom_histogram(position="stack", binwidth=1)+ facet_wrap(~ Year.Month, ncol=3, scales="free_x")
+```
+
+---
+### Plot reading counts for different weekdays
+
+
+```{r weekday, fig.width=8, fig.height=6}
+# Histogram of weekday reading counts
+ggplot(scoop.df, aes(x=WeekDay, fill=article.language)) + geom_histogram(position="stack", binwidth=1) + facet_wrap(~ Month, ncol=3) + theme(axis.text.x=element_text(angle=45, vjust=0.8))
+```
+
