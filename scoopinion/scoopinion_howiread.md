@@ -7,16 +7,7 @@
 
 ---
 
-## About
-* Personal [Scoopinion](http://www.scoopinion.com/) data [released](https://www.scoopinion.com/blog/download-your-reading-data) today
-* This report is created with [R](http://www.r-project.org/) and [RStudio](http://rstudio.org/)
- * See the [sourcecode](https://github.com/ouzor/misc/blob/master/scoopinion/howiread_ouzor_20120921.Rmd) in github
- * Uses package [knitr](http://yihui.name/knitr/) for easy markdown reporting
- * Uses package [ggplot2](http://ggplot2.org/) for figures
-
----
-
-### Obtaining the data
+### Reading the data
 
 Read the JSON data file
 
@@ -150,7 +141,7 @@ ggplot(scoop.df, aes(x = article.word_count, y = article.average_time, colour = 
     geom_jitter()
 ```
 
-![plot of chunk word_vs_time](http://i.imgur.com/mw1iQp4.png) 
+![plot of chunk word_vs_time](http://i.imgur.com/Vfs98OX.png) 
 
 
 ---
@@ -163,7 +154,7 @@ ggplot(scoop.df, aes(x = Date, fill = article.language)) + geom_histogram(positi
     binwidth = 1) + facet_wrap(~Year, ncol = 1, scales = "free_x")
 ```
 
-![plot of chunk time](http://i.imgur.com/a3Z2NZu.png) 
+![plot of chunk time](http://i.imgur.com/XDfaIwR.png) 
 
 
 ---
@@ -178,6 +169,6 @@ ggplot(scoop.df, aes(x = WeekDay, fill = article.language)) + geom_histogram(pos
     vjust = 0.8))
 ```
 
-![plot of chunk weekday](http://i.imgur.com/rr7tkIl.png) 
+![plot of chunk weekday](http://i.imgur.com/G9bejkB.png) 
 
 
