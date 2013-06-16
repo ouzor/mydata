@@ -28,7 +28,6 @@ PreprocessScoopinionData <- function(filename) {
   stopifnot(is.matrix(reads.mat))
   reads.df <- as.data.frame(t(reads.mat))
   
-  
   # Fix format to numeric 
   reads.df$total_time <- as.numeric(as.vector(reads.df$total_time))
   reads.df$words_read <- as.numeric(as.vector(reads.df$words_read))

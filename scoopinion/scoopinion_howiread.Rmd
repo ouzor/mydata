@@ -69,7 +69,7 @@ head(sort(table(reads.df$referrer), decreasing=T), 10)
 ---
 ### Study reading time vs. word count
 
-Scatter plot of average reading time vs. word count for Scoopinion users. Average reading speeds for both English and Finnish articles are also shown as lines. For longer articles (over 1000 words) the average reading speed seems slower Finnish articles than for English ones, which is expected.
+Scatter plot of average reading time vs. word count for Scoopinion users. Average reading speeds for both English and Finnish articles are also shown as lines. For longer articles (over 1000 words) the average reading speed seems slower for Finnish articles than for English ones, which is expected.
 
 ```{r word_vs_time1, warning=FALSE, message=FALSE, fig.width=10, fig.heigth=8}
 ggplot(reads.df, aes(x=article.word_count, y=article.average_time, colour=article.language)) + geom_point(position=position_jitter(width=0, height=10)) + geom_smooth(data=subset(reads.df, article.average_time > 0), method="lm")
@@ -88,13 +88,13 @@ ggplot(reads.df, aes(x=words_read, y=total_time, colour=article.language)) + geo
 ```
 
 
-Personal words read vs. article word count. There are surprisingly many articles where I have not read the whole article.
+Personal words read vs. article word count. There are surprisingly many cases where I have not read the whole article.
 
 ```{r word_vs_time4, warning=FALSE, message=FALSE, fig.width=10, fig.heigth=8}
 ggplot(reads.df, aes(x=article.word_count, y=words_read, colour=article.language)) + geom_abline(slope=1, linetype="dashed") + geom_jitter()
 ```
 
-Compare my reading time to average time of Scoopinion users Seems that I am on average slower reader, especially in English.
+Compare my reading time to average time of Scoopinion users. Seems that I am on average slower reader, especially in English.
 
 ```{r word_vs_time5, warning=FALSE, message=FALSE, fig.width=10, fig.heigth=8}
 ggplot(reads.df, aes(x=article.average_time, y=total_time, colour=article.language)) + geom_abline(slope=1, linetype="dashed") + geom_jitter()
@@ -119,17 +119,33 @@ Histogram of reading counts by weekdays, split by years. Strangely the years sho
 ggplot(reads.df, aes(x=WeekDay, fill=article.language)) + geom_histogram(position="stack", binwidth=1) + facet_wrap(~ Year, ncol=1) + theme(axis.text.x=element_text(angle=45, vjust=0.8))
 ```
 
-Study monthly averages for 10 most read sites. Add vertical line for HS paywall, introduced 20.11.2012. It seems after the HS paywall I started reading proportionally more other stuff.
+Study monthly averages for 10 most read sites. Add vertical line for HS paywall, introduced 20.11.2012. It seems after the HS paywall I started reading proportionally more other stuff, although the few low-reading months just before the paywall introduction make this analysis harder.
 
-```{r time3, fig.width=10, fig.height=6}
-top10.sites <- names(head(sort(table(reads.df$article.site.name), decreasing=T), 10))
-top10.df <- droplevels(subset(reads.df, article.site.name %in% top10.sites))
+```{r time3, fig.width=12, fig.height=6}
+# Extract data for top 10 sites
+top.sites <- names(head(sort(table(reads.df$article.site.name), decreasing=T), 8))
+top.df <- droplevels(subset(reads.df, article.site.name %in% top.sites))
+
 # Compute monthly averages
-top10.montly.df <- plyr::ddply(top10.df, c("article.site.name", "Year.Month"), summarise, Average_reads=length(id))
+top.montly.df <- plyr::ddply(top.df, c("article.site.name", "Year.Month"), summarise, Monthly_reads=length(id))
+
+# Add missing zeros for area plot
+temp.df <- expand.grid(article.site.name=unique(top.montly.df$article.site.name), Year.Month=unique(top.montly.df$Year.Month))
+top.montly.df <- merge(top.montly.df, temp.df, all.y=TRUE)
+top.montly.df$Monthly_reads[is.na(top.montly.df$Monthly_reads)] <- 0
+
+# Order by means
+top.montly.df$article.site.name <- reorder(top.montly.df$article.site.name, top.montly.df$Monthly_reads, sum)
 
 # Position of HS paywall
-paywall.pos <- which(unique(top10.montly.df$Year.Month)=="2012-11")
-ggplot(top10.montly.df, aes(x=Year.Month, y=Average_reads, colour=article.site.name)) + geom_path(aes(group=article.site.name)) + geom_vline(xintercept=paywall.pos, linetype="dashed") + annotate("text", x=paywall.pos+0.1, y=40, label="HS paywall", hjust=0)
+paywall.pos <- which(unique(top.montly.df$Year.Month)=="2012-11")
+
+# Plot as lines
+#ggplot(top.montly.df, aes(x=Year.Month, y=Monthly_reads, colour=article.site.name)) + geom_path(aes(group=article.site.name)) + geom_vline(xintercept=paywall.pos, linetype="dashed") + annotate("text", x=paywall.pos+0.1, y=40, label="HS paywall", hjust=0)
+
+# Plot as stacked aread plot
+ggplot(top.montly.df, aes(x=Year.Month, y=Monthly_reads, fill=article.site.name)) + geom_area(aes(group=article.site.name, order=desc(article.site.name)), position="stack") + scale_fill_brewer(palette="Set1") + geom_vline(xintercept=paywall.pos, linetype="dashed") + annotate("text", x=paywall.pos+0.1, y=100, label="HS paywall", hjust=0)
+
 ```
 
 
