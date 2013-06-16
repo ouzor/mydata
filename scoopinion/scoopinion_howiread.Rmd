@@ -54,7 +54,9 @@ reads.df <- droplevels(subset(reads.df, article.word_count < 5000))
 ```
 
 ---
-### List top sites
+### Top sites
+
+List top read article sites and to referrers (the site from which the read article was clicked)
 
 ```{r top_sites}
 # Most commonly read sites
@@ -67,41 +69,59 @@ head(sort(table(reads.df$referrer), decreasing=T), 10)
 ---
 ### Study reading time vs. word count
 
-```{r word_vs_time, warning=FALSE, message=FALSE, fig.width=8, fig.heigth=8}
-# Average reading time vs. word count
-ggplot(reads.df, aes(x=article.word_count, y=article.average_time, colour=article.language)) + geom_point(position=position_jitter(width=0, height=10))
+Scatter plot of average reading time vs. word count, with estimated means. 
 
-# With fitted means
+```{r word_vs_time1, warning=FALSE, message=FALSE, fig.width=10, fig.heigth=8}
 ggplot(reads.df, aes(x=article.word_count, y=article.average_time, colour=article.language)) + geom_point(position=position_jitter(width=0, height=10)) + geom_smooth(data=subset(reads.df, article.average_time>0))
+```
 
+My personal reading time vs. words.read
 
-# My personal reading time vs. words.read
-ggplot(reads.df, aes(x=total_time, y=words_read, colour=article.language)) + geom_point()
-# COMMENT: There appears to be a threshold for too high reading speed (a bit higher than 4 words / second)
-# COMMENT: There are also a lot of reads with zero words read, probably some measuring errors
-# QUESTION: Why some articles have 'average_time' zero?
+```{r word_vs_time2, warning=FALSE, message=FALSE, fig.width=10, fig.heigth=8}
+ggplot(reads.df, aes(x=words_read, y=total_time, colour=article.language)) + geom_point()
+```
 
-# My personal reading time vs. article word count
+My personal reading time vs. article word count
+
+```{r word_vs_time3, warning=FALSE, message=FALSE, fig.width=10, fig.heigth=8}
 ggplot(reads.df, aes(x=article.word_count, y=total_time, colour=article.language)) + geom_point()
+```
 
-# Personal words.read vs. article word count
+*COMMENT: There appears to be a threshold for too high reading speed (a bit higher than 4 words / second)*
+*COMMENT: There are also a lot of reads with zero words read, probably some measuring errors. But why some articles have 'average_time' zero?*
+
+Personal words.read vs. article word count
+```{r word_vs_time4, warning=FALSE, message=FALSE, fig.width=10, fig.heigth=8}
 ggplot(reads.df, aes(x=article.word_count, y=words_read, colour=article.language)) + geom_abline(slope=1, linetype="dashed") + geom_jitter()
+```
 
-# Compare my reading speed (total_time) to average
+Compare my reading speed (total_time) to average
+
+```{r word_vs_time5, warning=FALSE, message=FALSE, fig.width=10, fig.heigth=8}
 ggplot(reads.df, aes(x=article.average_time, y=total_time, colour=article.language)) + geom_abline(slope=1, linetype="dashed") + geom_jitter()
 ```
+
 
 ---
 ### Plot reading behaviour over time
 
-```{r time, fig.width=10, fig.height=6}
+Histogram of daily reads count
+
+```{r time1, fig.width=10, fig.height=6}
 # Histogram of daily reading counts
 ggplot(reads.df, aes(x=Date, fill=article.language)) + geom_histogram(position="stack", binwidth=1)+ facet_wrap(~ Year, ncol=1, scales="free_x")
+```
 
-# Histogram of reading counts by weekdays, split by months
+Histogram of reading counts by weekdays, split by months
+
+```{r time2, fig.width=10, fig.height=6}
+# Histogram of daily reading counts
 ggplot(reads.df, aes(x=WeekDay, fill=article.language)) + geom_histogram(position="stack", binwidth=1) + facet_wrap(~ Year.Month, ncol=5) + theme(axis.text.x=element_text(angle=45, vjust=0.8))
+```
 
-# Study development for top sites (HS,, etc.)
+Study monthly averages for 10 most read sites. Add vertical line for HS paywall, introduced 20.11.2013.
+
+```{r time3, fig.width=10, fig.height=6}
 top10.sites <- names(head(sort(table(reads.df$article.site.name), decreasing=T), 10))
 top10.df <- droplevels(subset(reads.df, article.site.name %in% top10.sites))
 # Compute monthly averages

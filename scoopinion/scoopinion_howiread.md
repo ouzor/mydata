@@ -94,7 +94,7 @@ reads.df <- droplevels(reads.df[-reads.to.remove, ])
 ggplot(reads.df, aes(x = article.word_count)) + geom_histogram(binwidth = 500)
 ```
 
-![plot of chunk filter](http://i.imgur.com/7kxAbAo.png) 
+![plot of chunk filter](http://i.imgur.com/MKHIK2m.png) 
 
 ```r
 reads.df <- droplevels(subset(reads.df, article.word_count < 5000))
@@ -102,7 +102,9 @@ reads.df <- droplevels(subset(reads.df, article.word_count < 5000))
 
 
 ---
-### List top sites
+### Top sites
+
+List top read article sites and to referrers (the site from which the read article was clicked)
 
 
 ```r
@@ -156,69 +158,69 @@ head(sort(table(reads.df$referrer), decreasing = T), 10)
 ---
 ### Study reading time vs. word count
 
+Scatter plot of average reading time vs. word count, with estimated means. 
+
 
 ```r
-# Average reading time vs. word count
-ggplot(reads.df, aes(x = article.word_count, y = article.average_time, colour = article.language)) + 
-    geom_point(position = position_jitter(width = 0, height = 10))
-```
-
-![plot of chunk word_vs_time](http://i.imgur.com/RBWm5xc.png) 
-
-```r
-
-# With fitted means
 ggplot(reads.df, aes(x = article.word_count, y = article.average_time, colour = article.language)) + 
     geom_point(position = position_jitter(width = 0, height = 10)) + geom_smooth(data = subset(reads.df, 
     article.average_time > 0))
 ```
 
-![plot of chunk word_vs_time](http://i.imgur.com/Zf7Ozjc.png) 
+![plot of chunk word_vs_time1](http://i.imgur.com/B2NoIHV.png) 
+
+
+My personal reading time vs. words.read
+
 
 ```r
-
-
-# My personal reading time vs. words.read
-ggplot(reads.df, aes(x = total_time, y = words_read, colour = article.language)) + 
+ggplot(reads.df, aes(x = words_read, y = total_time, colour = article.language)) + 
     geom_point()
 ```
 
-![plot of chunk word_vs_time](http://i.imgur.com/fxSvLc8.png) 
+![plot of chunk word_vs_time2](http://i.imgur.com/uTNXwgm.png) 
+
+
+My personal reading time vs. article word count
+
 
 ```r
-# COMMENT: There appears to be a threshold for too high reading speed (a
-# bit higher than 4 words / second) COMMENT: There are also a lot of reads
-# with zero words read, probably some measuring errors QUESTION: Why some
-# articles have 'average_time' zero?
-
-# My personal reading time vs. article word count
 ggplot(reads.df, aes(x = article.word_count, y = total_time, colour = article.language)) + 
     geom_point()
 ```
 
-![plot of chunk word_vs_time](http://i.imgur.com/dENlpn7.png) 
+![plot of chunk word_vs_time3](http://i.imgur.com/mGL1aKr.png) 
+
+
+*COMMENT: There appears to be a threshold for too high reading speed (a bit higher than 4 words / second)*
+*COMMENT: There are also a lot of reads with zero words read, probably some measuring errors. But why some articles have 'average_time' zero?*
+
+Personal words.read vs. article word count
 
 ```r
-
-# Personal words.read vs. article word count
 ggplot(reads.df, aes(x = article.word_count, y = words_read, colour = article.language)) + 
     geom_abline(slope = 1, linetype = "dashed") + geom_jitter()
 ```
 
-![plot of chunk word_vs_time](http://i.imgur.com/FQ8CXbv.png) 
+![plot of chunk word_vs_time4](http://i.imgur.com/1Jh5S3H.png) 
+
+
+Compare my reading speed (total_time) to average
+
 
 ```r
-
-# Compare my reading speed (total_time) to average
 ggplot(reads.df, aes(x = article.average_time, y = total_time, colour = article.language)) + 
     geom_abline(slope = 1, linetype = "dashed") + geom_jitter()
 ```
 
-![plot of chunk word_vs_time](http://i.imgur.com/DuRv1SW.png) 
+![plot of chunk word_vs_time5](http://i.imgur.com/87UIaug.png) 
+
 
 
 ---
 ### Plot reading behaviour over time
+
+Histogram of daily reads count
 
 
 ```r
@@ -227,21 +229,26 @@ ggplot(reads.df, aes(x = Date, fill = article.language)) + geom_histogram(positi
     binwidth = 1) + facet_wrap(~Year, ncol = 1, scales = "free_x")
 ```
 
-![plot of chunk time](http://i.imgur.com/JaWje3P.png) 
+![plot of chunk time1](http://i.imgur.com/iVpd2lw.png) 
+
+
+Histogram of reading counts by weekdays, split by months
+
 
 ```r
-
-# Histogram of reading counts by weekdays, split by months
+# Histogram of daily reading counts
 ggplot(reads.df, aes(x = WeekDay, fill = article.language)) + geom_histogram(position = "stack", 
     binwidth = 1) + facet_wrap(~Year.Month, ncol = 5) + theme(axis.text.x = element_text(angle = 45, 
     vjust = 0.8))
 ```
 
-![plot of chunk time](http://i.imgur.com/CuDElJb.png) 
+![plot of chunk time2](http://i.imgur.com/cgWayh5.png) 
+
+
+Study monthly averages for 10 most read sites. Add vertical line for HS paywall, introduced 20.11.2013.
+
 
 ```r
-
-# Study development for top sites (HS,, etc.)
 top10.sites <- names(head(sort(table(reads.df$article.site.name), decreasing = T), 
     10))
 top10.df <- droplevels(subset(reads.df, article.site.name %in% top10.sites))
@@ -257,7 +264,7 @@ ggplot(top10.montly.df, aes(x = Year.Month, y = Average_reads, colour = article.
     hjust = 0)
 ```
 
-![plot of chunk time](http://i.imgur.com/w9LZYby.png) 
+![plot of chunk time3](http://i.imgur.com/c7ALJLs.png) 
 
 
 
