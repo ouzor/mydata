@@ -1,6 +1,6 @@
 # How I read? - Introduction to Scoopinion reading behavior data with R
 ### Juuso Parkkinen - @ouzor
-### 15.6.2012
+### 16.6.2012
 
 ```{r setup, include=FALSE}
 # upload images to imgur automatically 
@@ -14,98 +14,99 @@ theme_set(theme_grey(16))
 
 ---
 
-### Reading the data
+### Read and preprocess data
 
-Read the JSON data file
+Read the JSON data file and preprocess reads data (see details in the [source code](scoopinion_functions.R))
 
 ```{r read_data, warning=FALSE}
-# Use package 'rjson' to read the data
-library(rjson)
-scoop.raw <- fromJSON(file="myscoopiniondata.json")
+source("scoopinion_functions.R")
+reads.df <- PreprocessScoopinionData(filename="my_scoopinion_data.json")
 ```
 
-See what metadata is given
-
-```{r meta}
-# Check meta data
-scoop.raw$meta
-```
----
-
-### Preprocessing
-The interesting part is the 'reads' data. Process it into analysable format:
-
-```{r preprocess, warning=FALSE}
-common.items <- c("id", "words_read", "created_at", "article.id", "article.title", "article.url", "article.word_count", "article.average_time", "article.language", "article.site.name", "article.site.id", "article.site.url")
-temp.mat <- sapply(scoop.raw$reads, function(x) {res=unlist(x); return(res[names(res) %in% common.items])})
-# Produce a data frame
-scoop.df <- data.frame(t(temp.mat))
-# Transform some columns to numeric form
-scoop.df[c("words_read", "article.word_count", "article.average_time")] <- sapply(scoop.df[c("words_read", "article.word_count", "article.average_time")], function(x) as.numeric(as.vector(x)))
-# Remove reads with missing data
-scoop.df <- na.omit(scoop.df)
-
-```
-
-R has nice tools for handling Dates, with easy addition of weekday and month information:
-
-```{r date}
-# Add date in a proper format
-scoop.df$Date <- as.Date(sapply(strsplit(as.vector(scoop.df$created_at), split="T"), function(x) x[1]))
-# Add weekdays
-scoop.df$WeekDay <- factor(weekdays(scoop.df$Date), levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
-# Add months
-scoop.df$Month <- factor(months(scoop.df$Date), levels=month.name)
-# Add years
-scoop.df$Year <- format(scoop.df$Date, format = "%Y")
-# Add combined year-month information
-scoop.df$Year.Month <- factor(paste(scoop.df$Year, scoop.df$Month, sep=" - "))
-temp.ym <- paste(rep(c("2012", "2013"), each=length(month.name)), month.name, sep=" - ")
-scoop.df$Year.Month <- factor(scoop.df$Year.Month, levels=temp.ym)
-# Cut away 2013 - April (only one read)
-scoop.df <- droplevels(subset(scoop.df, Year.Month != "2013 - April"))
-```
 
 ---
-### Basic stuff
+### Filter data
 
-```{r basic}
-# Most commonly read sites
-head(sort(table(scoop.df$article.site.name), decreasing=T), 10)
-
-# Language distribution
-table(scoop.df$article.language)
-
+```{r filter}
 # Remove rare languages
-scoop.df <- droplevels(subset(scoop.df, article.language %in% c("en", "fi")))
+table(reads.df$article.language)
+reads.df <- droplevels(subset(reads.df, article.language %in% c("en", "fi")))
 
-# Top referring sites (currently not included in the anlysis because they are missing from some reads)
-# head(sort(table(scoop.df$referrer), decreasing=T), 5)
+# Remove rare months
+table(reads.df$Year.Month)
+reads.df <- droplevels(subset(reads.df, Year.Month != "2013-04"))
+
+# Study reads with repeating 'article.title'
+repeats <- table(reads.df$article.title)
+repeats <- repeats[repeats > 1]
+print(repeats)
+# Based on this, remove comics and Yle Areena
+reads.to.remove <- which(reads.df$article.title %in% c("Anonyymit eläimet", "Fok_it", "Fok_it — Nyt", "Sarjakuvat", "Yle Areena"))
+print(length(reads.to.remove))
+reads.df <- droplevels(reads.df[-reads.to.remove, ])
+
+# Remove very long articles
+qplot(reads.df$article.word_count)
+reads.df <- droplevels(subset(reads.df, article.word_count < 5000))
 ```
 
+---
+### List top sites
+
+```{r top_sites}
+# Most commonly read sites
+head(sort(table(reads.df$article.site.name), decreasing=T), 10)
+
+# Top referring sites
+head(sort(table(reads.df$referrer), decreasing=T), 10)
+```
 
 ---
-### Plot word counts against average reading times
+### Study reading time vs. word count
 
 ```{r word_vs_time, message=FALSE, fig.width=8, fig.heigth=8}
-# Scatter plot of word count vs. average time, colour based on languages
-ggplot(scoop.df, aes(x=article.word_count, y=article.average_time, colour=article.language)) + geom_jitter()
+# Average reading time vs. word count
+ggplot(reads.df, aes(x=article.word_count, y=article.average_time, colour=article.language)) + geom_point(position=position_jitter(width=0, height=10))
+
+# With fitted means
+ggplot(reads.df, aes(x=article.word_count, y=article.average_time, colour=article.language)) + geom_point(position=position_jitter(width=0, height=10)) + geom_smooth(data=subset(reads.df, article.average_time>0))
+
+
+# My personal reading time vs. words.read
+ggplot(reads.df, aes(x=total_time, y=words_read, colour=article.language)) + geom_point()
+# COMMENT: There appears to be a threshold for too high reading speed (a bit higher than 4 words / second)
+# COMMENT: There are also a lot of reads with zero words read, probably some measuring errors
+# QUESTION: Why some articles have 'average_time' zero?
+
+# My personal reading time vs. article word count
+ggplot(reads.df, aes(x=article.word_count, y=total_time, colour=article.language)) + geom_point()
+
+# Personal words.read vs. article word count
+ggplot(reads.df, aes(x=article.word_count, y=words_read, colour=article.language)) + geom_abline(slope=1, linetype="dashed") + geom_jitter()
+
+# Compare my reading speed (total_time) to average
+ggplot(reads.df, aes(x=article.average_time, y=total_time, colour=article.language)) + geom_abline(slope=1, linetype="dashed") + geom_jitter()
 ```
 
 ---
-### Plot reading behaviour over time, split by years
+### Plot reading behaviour over time
 
 ```{r time, fig.width=10, fig.height=6}
 # Histogram of daily reading counts
-ggplot(scoop.df, aes(x=Date, fill=article.language)) + geom_histogram(position="stack", binwidth=1)+ facet_wrap(~ Year, ncol=1, scales="free_x")
+ggplot(reads.df, aes(x=Date, fill=article.language)) + geom_histogram(position="stack", binwidth=1)+ facet_wrap(~ Year, ncol=1, scales="free_x")
+
+# Histogram of reading counts by weekdays, split by months
+ggplot(reads.df, aes(x=WeekDay, fill=article.language)) + geom_histogram(position="stack", binwidth=1) + facet_wrap(~ Year.Month, ncol=5) + theme(axis.text.x=element_text(angle=45, vjust=0.8))
+
+# Study development for top sites (HS,, etc.)
+top10.sites <- names(head(sort(table(reads.df$article.site.name), decreasing=T), 10))
+top10.df <- droplevels(subset(reads.df, article.site.name %in% top10.sites))
+# Compute monthly averages
+top10.montly.df <- plyr::ddply(top10.df, c("article.site.name", "Year.Month"), summarise, Average_reads=length(id))
+
+# Position of HS paywall
+paywall.pos <- which(unique(top10.montly.df$Year.Month)=="2012-11")
+ggplot(top10.montly.df, aes(x=Year.Month, y=Average_reads, colour=article.site.name)) + geom_path(aes(group=article.site.name)) + geom_vline(xintercept=paywall.pos, linetype="dashed") + annotate("text", x=paywall.pos+0.1, y=40, label="HS paywall introduced 20.11.2012", hjust=0)
 ```
 
----
-### Plot reading counts for different weekdays
-
-
-```{r weekday, fig.width=12, fig.height=6}
-# Histogram of weekday reading counts
-ggplot(scoop.df, aes(x=WeekDay, fill=article.language)) + geom_histogram(position="stack", binwidth=1) + facet_wrap(~ Year.Month, ncol=5) + theme(axis.text.x=element_text(angle=45, vjust=0.8))
-```
 
