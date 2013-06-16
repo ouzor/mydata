@@ -91,10 +91,10 @@ message("Removed ", length(reads.to.remove), " reads")
 reads.df <- droplevels(reads.df[-reads.to.remove, ])
 
 # Remove very long articles
-ggplot(reads.df, aes(x = article.word_count)) + geom_histogram(binwidth = 500)
+ggplot(reads.df, aes(x = article.word_count)) + geom_histogram(binwidth = 1000)
 ```
 
-![plot of chunk filter](http://i.imgur.com/MKHIK2m.png) 
+![plot of chunk filter](http://i.imgur.com/XXYinqj.png) 
 
 ```r
 reads.df <- droplevels(subset(reads.df, article.word_count < 5000))
@@ -158,54 +158,51 @@ head(sort(table(reads.df$referrer), decreasing = T), 10)
 ---
 ### Study reading time vs. word count
 
-Scatter plot of average reading time vs. word count, with estimated means. 
+Scatter plot of average reading time vs. word count for Scoopinion users. Average reading speeds for both English and Finnish articles are also shown as lines. For longer articles (over 1000 words) the average reading speed seems slower Finnish articles than for English ones, which is expected.
 
 
 ```r
 ggplot(reads.df, aes(x = article.word_count, y = article.average_time, colour = article.language)) + 
     geom_point(position = position_jitter(width = 0, height = 10)) + geom_smooth(data = subset(reads.df, 
-    article.average_time > 0))
+    article.average_time > 0), method = "lm")
 ```
 
-![plot of chunk word_vs_time1](http://i.imgur.com/B2NoIHV.png) 
+![plot of chunk word_vs_time1](http://i.imgur.com/QNgBhEO.png) 
 
 
-My personal reading time vs. words.read
+My personal reading time vs. words read. There appears to be a threshold for too high reading speed (a bit higher than 4 words / second). There are also a lot of reads with zero words read, probably some measuring errors... Again the reading times for Finnish articles seems to be higher, but the difference is smaller. And the articles with very few words read also distort the analysis.
 
 
 ```r
 ggplot(reads.df, aes(x = words_read, y = total_time, colour = article.language)) + 
-    geom_point()
+    geom_point() + geom_smooth(data = subset(reads.df, words_read > 0), method = "lm")
 ```
 
-![plot of chunk word_vs_time2](http://i.imgur.com/uTNXwgm.png) 
+![plot of chunk word_vs_time2](http://i.imgur.com/hUbx0b2.png) 
 
 
-My personal reading time vs. article word count
 
 
 ```r
-ggplot(reads.df, aes(x = article.word_count, y = total_time, colour = article.language)) + 
-    geom_point()
+# My personal reading time vs. article word count. ggplot(reads.df,
+# aes(x=article.word_count, y=total_time, colour=article.language)) +
+# geom_point() + geom_smooth()
 ```
 
-![plot of chunk word_vs_time3](http://i.imgur.com/mGL1aKr.png) 
 
 
-*COMMENT: There appears to be a threshold for too high reading speed (a bit higher than 4 words / second)*
-*COMMENT: There are also a lot of reads with zero words read, probably some measuring errors. But why some articles have 'average_time' zero?*
+Personal words read vs. article word count. There are surprisingly many articles where I have not read the whole article.
 
-Personal words.read vs. article word count
 
 ```r
 ggplot(reads.df, aes(x = article.word_count, y = words_read, colour = article.language)) + 
     geom_abline(slope = 1, linetype = "dashed") + geom_jitter()
 ```
 
-![plot of chunk word_vs_time4](http://i.imgur.com/1Jh5S3H.png) 
+![plot of chunk word_vs_time4](http://i.imgur.com/zqyv5LW.png) 
 
 
-Compare my reading speed (total_time) to average
+Compare my reading time to average time of Scoopinion users Seems that I am on average slower reader, especially in English.
 
 
 ```r
@@ -213,14 +210,14 @@ ggplot(reads.df, aes(x = article.average_time, y = total_time, colour = article.
     geom_abline(slope = 1, linetype = "dashed") + geom_jitter()
 ```
 
-![plot of chunk word_vs_time5](http://i.imgur.com/87UIaug.png) 
+![plot of chunk word_vs_time5](http://i.imgur.com/tIDw91p.png) 
 
 
 
 ---
 ### Plot reading behaviour over time
 
-Histogram of daily reads count
+Histogram of daily reads count. Apparently I did no read much in October and November, 2012.
 
 
 ```r
@@ -229,23 +226,24 @@ ggplot(reads.df, aes(x = Date, fill = article.language)) + geom_histogram(positi
     binwidth = 1) + facet_wrap(~Year, ncol = 1, scales = "free_x")
 ```
 
-![plot of chunk time1](http://i.imgur.com/iVpd2lw.png) 
+![plot of chunk time1](http://i.imgur.com/DMg5h7d.png) 
 
 
-Histogram of reading counts by weekdays, split by months
+Histogram of reading counts by weekdays, split by years. Strangely the years show somewhat opposite patterns, so can not say much about this...
+
 
 
 ```r
 # Histogram of daily reading counts
 ggplot(reads.df, aes(x = WeekDay, fill = article.language)) + geom_histogram(position = "stack", 
-    binwidth = 1) + facet_wrap(~Year.Month, ncol = 5) + theme(axis.text.x = element_text(angle = 45, 
+    binwidth = 1) + facet_wrap(~Year, ncol = 1) + theme(axis.text.x = element_text(angle = 45, 
     vjust = 0.8))
 ```
 
-![plot of chunk time2](http://i.imgur.com/cgWayh5.png) 
+![plot of chunk time2](http://i.imgur.com/rZlH6sd.png) 
 
 
-Study monthly averages for 10 most read sites. Add vertical line for HS paywall, introduced 20.11.2013.
+Study monthly averages for 10 most read sites. Add vertical line for HS paywall, introduced 20.11.2012. It seems after the HS paywall I started reading proportionally more other stuff.
 
 
 ```r
@@ -260,11 +258,11 @@ top10.montly.df <- plyr::ddply(top10.df, c("article.site.name", "Year.Month"),
 paywall.pos <- which(unique(top10.montly.df$Year.Month) == "2012-11")
 ggplot(top10.montly.df, aes(x = Year.Month, y = Average_reads, colour = article.site.name)) + 
     geom_path(aes(group = article.site.name)) + geom_vline(xintercept = paywall.pos, 
-    linetype = "dashed") + annotate("text", x = paywall.pos + 0.1, y = 40, label = "HS paywall introduced 20.11.2012", 
+    linetype = "dashed") + annotate("text", x = paywall.pos + 0.1, y = 40, label = "HS paywall", 
     hjust = 0)
 ```
 
-![plot of chunk time3](http://i.imgur.com/c7ALJLs.png) 
+![plot of chunk time3](http://i.imgur.com/iDQaqB4.png) 
 
 
 

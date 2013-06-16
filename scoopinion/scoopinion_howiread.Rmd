@@ -49,7 +49,7 @@ message("Removed ", length(reads.to.remove), " reads")
 reads.df <- droplevels(reads.df[-reads.to.remove, ])
 
 # Remove very long articles
-ggplot(reads.df, aes(x=article.word_count)) + geom_histogram(binwidth=500)
+ggplot(reads.df, aes(x=article.word_count)) + geom_histogram(binwidth=1000)
 reads.df <- droplevels(subset(reads.df, article.word_count < 5000))
 ```
 
@@ -129,7 +129,7 @@ top10.montly.df <- plyr::ddply(top10.df, c("article.site.name", "Year.Month"), s
 
 # Position of HS paywall
 paywall.pos <- which(unique(top10.montly.df$Year.Month)=="2012-11")
-ggplot(top10.montly.df, aes(x=Year.Month, y=Average_reads, colour=article.site.name)) + geom_path(aes(group=article.site.name)) + geom_vline(xintercept=paywall.pos, linetype="dashed") + annotate("text", x=paywall.pos+0.1, y=40, label="HS paywall introduced 20.11.2012", hjust=0)
+ggplot(top10.montly.df, aes(x=Year.Month, y=Average_reads, colour=article.site.name)) + geom_path(aes(group=article.site.name)) + geom_vline(xintercept=paywall.pos, linetype="dashed") + annotate("text", x=paywall.pos+0.1, y=40, label="HS paywall", hjust=0)
 ```
 
 
