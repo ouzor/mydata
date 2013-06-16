@@ -17,18 +17,12 @@ source("scoopinion_functions.R")
 reads.df <- PreprocessScoopinionData(filename = "my_scoopinion_data.json")
 ```
 
-```
-## Preprocessing Scoopinion data from my_scoopinion_data.json...
-```
-
-```
-## DONE
-```
-
 
 
 ---
 ### Filter data
+
+Read code comments for details
 
 
 ```r
@@ -62,70 +56,45 @@ reads.df <- droplevels(subset(reads.df, Year.Month != "2013-04"))
 
 # Study reads with repeating 'article.title'
 repeats <- table(reads.df$article.title)
-repeats <- repeats[repeats > 1]
+repeats <- repeats[repeats > 2]
 print(repeats)
 ```
 
 ```
 ## 
-##                                                                        Anonyymit eläimet 
-##                                                                                        3 
-##                                                        Dell UltraSharp U3011 30" Display 
-##                                                                                        2 
-##                                                                                   Fok_it 
-##                                                                                        4 
-##                                                                             Fok_it — Nyt 
-##                                                                                       14 
-##                            Helsinki haluaa poistaa ilmaisen pysäköinnin kantakaupungissa 
-##                                                                                        2 
-##                                    How to Get Anything You Want with Minimal Negotiation 
-##                                                                                        2 
-##                                             Joukkotappelu ja alaston kelkkailija Levillä 
-##                                                                                        2 
-##                                                      Julkista dataa vielä vähän tarjolla 
-##                                                                                        2 
-##                                                  Kotona tehdyt ylityöt ovat terveysriski 
-##                                                                                        2 
-##                                                           Lihavuus tappaa nälkää enemmän 
-##                                                                                        2 
-## Naistoimittajat kakkasivat tahallaan housuun bussissa - bussiyhtiö raivostui vahingoista 
-##                                                                                        2 
-##                                                                               Sarjakuvat 
-##                                                                                       46 
-##                                            Suomalaiset Lontoon olympiakisoissa tiistaina 
-##                                                                                        2 
-##                                         The Man Who Killed Osama bin Laden... Is Screwed 
-##                                                                                        4 
-##                                                 Tulevaisuusselonteko teille, suomalaiset 
-##                                                                                        2 
-##                                                                               Yle Areena 
-##                                                                                       25
+##                                Anonyymit eläimet 
+##                                                3 
+##                                           Fok_it 
+##                                                4 
+##                                     Fok_it — Nyt 
+##                                               14 
+##                                       Sarjakuvat 
+##                                               46 
+## The Man Who Killed Osama bin Laden... Is Screwed 
+##                                                4 
+##                                       Yle Areena 
+##                                               25
 ```
 
 ```r
 # Based on this, remove comics and Yle Areena
 reads.to.remove <- which(reads.df$article.title %in% c("Anonyymit eläimet", 
     "Fok_it", "Fok_it — Nyt", "Sarjakuvat", "Yle Areena"))
-print(length(reads.to.remove))
+message("Removed ", length(reads.to.remove), " reads")
 ```
 
 ```
-## [1] 92
+## Removed 92 reads
 ```
 
 ```r
 reads.df <- droplevels(reads.df[-reads.to.remove, ])
 
 # Remove very long articles
-qplot(reads.df$article.word_count)
+ggplot(reads.df, aes(x = article.word_count)) + geom_histogram(binwidth = 500)
 ```
 
-```
-## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust
-## this.
-```
-
-![plot of chunk filter](http://i.imgur.com/OoOCeb9.png) 
+![plot of chunk filter](http://i.imgur.com/7kxAbAo.png) 
 
 ```r
 reads.df <- droplevels(subset(reads.df, article.word_count < 5000))
@@ -194,11 +163,7 @@ ggplot(reads.df, aes(x = article.word_count, y = article.average_time, colour = 
     geom_point(position = position_jitter(width = 0, height = 10))
 ```
 
-```
-## Warning: Removed 2 rows containing missing values (geom_point).
-```
-
-![plot of chunk word_vs_time](http://i.imgur.com/LmRSQfb.png) 
+![plot of chunk word_vs_time](http://i.imgur.com/RBWm5xc.png) 
 
 ```r
 
@@ -208,11 +173,7 @@ ggplot(reads.df, aes(x = article.word_count, y = article.average_time, colour = 
     article.average_time > 0))
 ```
 
-```
-## Warning: Removed 2 rows containing missing values (geom_point).
-```
-
-![plot of chunk word_vs_time](http://i.imgur.com/OAU1PyD.png) 
+![plot of chunk word_vs_time](http://i.imgur.com/Zf7Ozjc.png) 
 
 ```r
 
@@ -222,11 +183,7 @@ ggplot(reads.df, aes(x = total_time, y = words_read, colour = article.language))
     geom_point()
 ```
 
-```
-## Warning: Removed 16 rows containing missing values (geom_point).
-```
-
-![plot of chunk word_vs_time](http://i.imgur.com/bhUs5Mk.png) 
+![plot of chunk word_vs_time](http://i.imgur.com/fxSvLc8.png) 
 
 ```r
 # COMMENT: There appears to be a threshold for too high reading speed (a
@@ -239,11 +196,7 @@ ggplot(reads.df, aes(x = article.word_count, y = total_time, colour = article.la
     geom_point()
 ```
 
-```
-## Warning: Removed 16 rows containing missing values (geom_point).
-```
-
-![plot of chunk word_vs_time](http://i.imgur.com/9sVQ8Ji.png) 
+![plot of chunk word_vs_time](http://i.imgur.com/dENlpn7.png) 
 
 ```r
 
@@ -252,7 +205,7 @@ ggplot(reads.df, aes(x = article.word_count, y = words_read, colour = article.la
     geom_abline(slope = 1, linetype = "dashed") + geom_jitter()
 ```
 
-![plot of chunk word_vs_time](http://i.imgur.com/NFkEY0B.png) 
+![plot of chunk word_vs_time](http://i.imgur.com/FQ8CXbv.png) 
 
 ```r
 
@@ -261,11 +214,7 @@ ggplot(reads.df, aes(x = article.average_time, y = total_time, colour = article.
     geom_abline(slope = 1, linetype = "dashed") + geom_jitter()
 ```
 
-```
-## Warning: Removed 16 rows containing missing values (geom_point).
-```
-
-![plot of chunk word_vs_time](http://i.imgur.com/jHxg4O9.png) 
+![plot of chunk word_vs_time](http://i.imgur.com/DuRv1SW.png) 
 
 
 ---
@@ -278,7 +227,7 @@ ggplot(reads.df, aes(x = Date, fill = article.language)) + geom_histogram(positi
     binwidth = 1) + facet_wrap(~Year, ncol = 1, scales = "free_x")
 ```
 
-![plot of chunk time](http://i.imgur.com/eLeMZjC.png) 
+![plot of chunk time](http://i.imgur.com/JaWje3P.png) 
 
 ```r
 
@@ -288,7 +237,7 @@ ggplot(reads.df, aes(x = WeekDay, fill = article.language)) + geom_histogram(pos
     vjust = 0.8))
 ```
 
-![plot of chunk time](http://i.imgur.com/XcsQ9bM.png) 
+![plot of chunk time](http://i.imgur.com/CuDElJb.png) 
 
 ```r
 
@@ -299,32 +248,16 @@ top10.df <- droplevels(subset(reads.df, article.site.name %in% top10.sites))
 # Compute monthly averages
 top10.montly.df <- plyr::ddply(top10.df, c("article.site.name", "Year.Month"), 
     summarise, Average_reads = length(id))
-```
-
-```
-## Error: object 'summarise' not found
-```
-
-```r
 
 # Position of HS paywall
 paywall.pos <- which(unique(top10.montly.df$Year.Month) == "2012-11")
-```
-
-```
-## Error: object 'top10.montly.df' not found
-```
-
-```r
 ggplot(top10.montly.df, aes(x = Year.Month, y = Average_reads, colour = article.site.name)) + 
     geom_path(aes(group = article.site.name)) + geom_vline(xintercept = paywall.pos, 
     linetype = "dashed") + annotate("text", x = paywall.pos + 0.1, y = 40, label = "HS paywall introduced 20.11.2012", 
     hjust = 0)
 ```
 
-```
-## Error: object 'top10.montly.df' not found
-```
+![plot of chunk time](http://i.imgur.com/w9LZYby.png) 
 
 
 

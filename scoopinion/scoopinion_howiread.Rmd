@@ -7,6 +7,7 @@
 opts_knit$set(upload.fun = imgur_upload)
 
 # Load required libraries
+library(plyr)
 library(ggplot2)
 theme_set(theme_grey(16))
 
@@ -18,7 +19,7 @@ theme_set(theme_grey(16))
 
 Read the JSON data file and preprocess reads data (see details in the [source code](scoopinion_functions.R))
 
-```{r read_data, warning=FALSE}
+```{r read_data, warning=FALSE, message=FALSE}
 source("scoopinion_functions.R")
 reads.df <- PreprocessScoopinionData(filename="my_scoopinion_data.json")
 ```
@@ -27,7 +28,9 @@ reads.df <- PreprocessScoopinionData(filename="my_scoopinion_data.json")
 ---
 ### Filter data
 
-```{r filter}
+Read code comments for details
+
+```{r filter, fig.width=6, fig.height=4}
 # Remove rare languages
 table(reads.df$article.language)
 reads.df <- droplevels(subset(reads.df, article.language %in% c("en", "fi")))
@@ -38,15 +41,15 @@ reads.df <- droplevels(subset(reads.df, Year.Month != "2013-04"))
 
 # Study reads with repeating 'article.title'
 repeats <- table(reads.df$article.title)
-repeats <- repeats[repeats > 1]
+repeats <- repeats[repeats > 2]
 print(repeats)
 # Based on this, remove comics and Yle Areena
 reads.to.remove <- which(reads.df$article.title %in% c("Anonyymit eläimet", "Fok_it", "Fok_it — Nyt", "Sarjakuvat", "Yle Areena"))
-print(length(reads.to.remove))
+message("Removed ", length(reads.to.remove), " reads")
 reads.df <- droplevels(reads.df[-reads.to.remove, ])
 
 # Remove very long articles
-qplot(reads.df$article.word_count)
+ggplot(reads.df, aes(x=article.word_count)) + geom_histogram(binwidth=500)
 reads.df <- droplevels(subset(reads.df, article.word_count < 5000))
 ```
 
@@ -64,7 +67,7 @@ head(sort(table(reads.df$referrer), decreasing=T), 10)
 ---
 ### Study reading time vs. word count
 
-```{r word_vs_time, message=FALSE, fig.width=8, fig.heigth=8}
+```{r word_vs_time, warning=FALSE, message=FALSE, fig.width=8, fig.heigth=8}
 # Average reading time vs. word count
 ggplot(reads.df, aes(x=article.word_count, y=article.average_time, colour=article.language)) + geom_point(position=position_jitter(width=0, height=10))
 
