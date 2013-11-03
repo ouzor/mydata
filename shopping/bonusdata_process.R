@@ -12,35 +12,13 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-## LOAD REQUIRED PACKAGES ##########
-
-library(plyr)
-library(lubridate)
-
-library(RCurl)
-library(rjson)
-
-library(ggplot2)
-library(RColorBrewer)
-library(gridExtra)
-
-library(ggmap)
-library(sorvi)
-theme_set(GetThemeMap())
-
-# Package for sonification
-library(playitbyr)
-# Using csound 5.2
-setCsoundLibrary("/Library/Frameworks/CsoundLib.framework/Versions/Current/lib_csnd.dylib")
-
-# Package for animation
-library(animation)
-
+# Set folder path
 dat.folder <- ""
 
-## PROCESS K DATA ######
 
 ## SPLIT K-DATA PNG'S TO HALF ########
+
+library(png)
 
 # Go through pictures with data
 counter <- 1
@@ -48,7 +26,7 @@ counter <- 1
 for (i in 6:10) {
   
   # Read original figure
-  filename <- paste0(dat.folder, "K-data_split_",i,".png")
+  filename <- paste0(dat.folder, "K-data_processed/K-data_split_",i,".png")
   message(filename)
   temp.png <- readPNG(filename)
   
@@ -57,9 +35,9 @@ for (i in 6:10) {
   split2 <- temp.png[(nrow(temp.png)/2):nrow(temp.png), ]
   
   # Write halfs
-  writePNG(split1, paste0(dat.folder, "K-data_half_",counter,".png"))
+  writePNG(split1, paste0(dat.folder, "K-data_processed/K-data_half_",counter,".png"))
   counter <- counter + 1
-  writePNG(split2, paste0(dat.folder, "K-data_half_",counter,".png"))
+  writePNG(split2, paste0(dat.folder, "K-data_processed/K-data_half_",counter,".png"))
   counter <- counter + 1
 }
 
@@ -69,11 +47,11 @@ for (i in 6:10) {
 for (i in 1:10) {
   
   # Read half a page
-  temp.png <- readPNG(paste0(dat.folder, "K-data_half_",i,".png"))
+  temp.png <- readPNG(paste0(dat.folder, "K-data_processed/K-data_half_",i,".png"))
   # Remove lines (function given below)
   temp.png.linesremoved <- RemoveLines(temp.png)
   # Write new figure
-  writePNG(temp.png.linesremoved, paste0(dat.folder, "K-data_half_linesremoved_",i,".png"))
+  writePNG(temp.png.linesremoved, paste0(dat.folder, "K-data_processed/K-data_half_linesremoved_",i,".png"))
 }
 
 # Function for removing lines from a given K-data figure
@@ -161,7 +139,7 @@ RemoveLines <- function(temp.png) {
 
 ## CLEAN TXT FILE #########
 
-k.raw <- scan(file=file.path(dat.folder, "K-data_raw.txt"), what="character", sep="\n")
+k.raw <- scan(file=file.path(dat.folder, "K-data_processed/K-data_raw.txt"), what="character", sep="\n")
 k.dat <- k.raw
 
 # Delete some character
@@ -171,7 +149,8 @@ for (char in to.remove)
   k.dat <- gsub(char, "", k.dat)
 
 # Write
-write(k.dat, file=file.path(dat.folder, "K-data_curated.txt"), ncolumns=1)
+write(k.dat, file=file.path(dat.folder, "K-data_processed/K-data_curated.txt"), ncolumns=1)
+
 
 ## READ S-DATA ############
 
@@ -232,9 +211,12 @@ levels(datS.df$Shop) <- sapply(strsplit(levels(datS.df$Shop), split=" "), functi
 save(datS.df, file=file.path(dat.folder, "S-data_raw_20131031.RData"))
 
 
-## PROCESS S- AND K-DATA #########
+## COMBINE AND PROCESS S- AND K-DATA #########
 
-# S-data was preprocessed in "S-data_read_20131031.R"
+library(plyr)
+library(lubridate)
+
+# Load preprocessed S-data
 load(file.path(dat.folder, "S-data_raw_20131031.RData"))
 
 # K-Data is already in easily readable format
@@ -266,6 +248,9 @@ dat <- dat[order(dat$Date),]
 
 ## ADD SHOP CATEGORIES #####
 
+library(RCurl)
+library(rjson)
+
 # Add shop categories
 shop.cats <- rep("Other", nrow(dat))
 #events.df$Shop <- toupper(events.df$Shop)
@@ -282,37 +267,40 @@ shop.cats[grep("Intersport", dat$Shop)] <- "Intersport"
 dat$ShopCategory <- factor(shop.cats)
 dat$ShopCategory <- factor(dat$ShopCategory, levels=levels(dat$ShopCategory)[c(1,2,9,8,5,6,4,3,7)])
 
-sort(table(droplevels(subset(dat, ShopCategory=="Other"))$Shop))
+# sort(table(droplevels(subset(dat, ShopCategory=="Other"))$Shop))
 
 
 ## ADD SHOP LOCATIONS #######
 
 
-# # Write shops down, fix by manually, and geocode with nominatim
-# shops.df <- data.frame(Shop.orig=sort(levels(dat$Shop)), Shop.curated=sort(levels(dat$Shop)))
-# write.csv(shops.df, row.names=FALSE, file=file.path(dat.folder, "Bonusdata_Shops_raw_20131031.csv"))
-# # Manual curation here
-# shops.curated.df <- read.csv(file.path(dat.folder, "Bonusdata_Shops_curated_20131031.csv"), sep="\t")
-# # Get geocodes from Nominatim (OpenStreetMap)
-# shops.curated.df$Lat <- shops.curated.df$Lon <- NA
-# for (i in 1:nrow(shops.curated.df)) {
-#   Sys.sleep(1)
-#   query <- gsub(" ", "+", as.vector(shops.curated.df$Shop.curated)[i])
-#   message(query)
-#   u <- paste0("http://nominatim.openstreetmap.org/search?q=",query,"&format=json")
-#   geocode <- rjson::fromJSON(RCurl::getURI(u))
-#   if (length(geocode)) {
-#     message("Found ", length(geocode))
-#     shops.curated.df$Lat[i] <- geocode[[1]]$lat
-#     shops.curated.df$Lon[i] <- geocode[[1]]$lon
-#   } else {
-#     message("Not found")
-#   }
-# }
-# shops.curated.df$Lat <- as.numeric(shops.curated.df$Lat)
-# shops.curated.df$Lon <- as.numeric(shops.curated.df$Lon)
-# save(shops.curated.df, file=file.path(dat.folder, "Bonusdata_Shop-locations_20131102.RData"))
+# Write shops down, fix by manually, and geocode with nominatim
+shops.df <- data.frame(Shop.orig=sort(levels(dat$Shop)), Shop.curated=sort(levels(dat$Shop)))
+write.csv(shops.df, row.names=FALSE, file=file.path(dat.folder, "Bonusdata_Shops_raw_20131031.csv"))
+# Manual curation here
+shops.curated.df <- read.csv(file.path(dat.folder, "Bonusdata_Shops_curated_20131031.csv"), sep="\t")
+# Get geocodes from Nominatim (OpenStreetMap)
+shops.curated.df$Lat <- shops.curated.df$Lon <- NA
+for (i in 1:nrow(shops.curated.df)) {
+  Sys.sleep(1)
+  query <- gsub(" ", "+", as.vector(shops.curated.df$Shop.curated)[i])
+  message(query)
+  u <- paste0("http://nominatim.openstreetmap.org/search?q=",query,"&format=json")
+  geocode <- rjson::fromJSON(RCurl::getURI(u))
+  if (length(geocode)) {
+    message("Found ", length(geocode))
+    shops.curated.df$Lat[i] <- geocode[[1]]$lat
+    shops.curated.df$Lon[i] <- geocode[[1]]$lon
+  } else {
+    message("Not found")
+  }
+}
+shops.curated.df$Lat <- as.numeric(shops.curated.df$Lat)
+shops.curated.df$Lon <- as.numeric(shops.curated.df$Lon)
+save(shops.curated.df, file=file.path(dat.folder, "Bonusdata_Shop-locations_20131102.RData"))
+
+
 load(file.path(dat.folder, "Bonusdata_Shop-locations_20131102.RData"))
+
 # Merge shop location data to shopping data
 dat <- merge(dat, shops.curated.df[c("Shop.orig", "Lat", "Lon")], by.x="Shop", by.y="Shop.orig")
 
@@ -331,11 +319,11 @@ save(dat, file=file.path(dat.folder, "Bonusdata_20131103.RData"))
 
 ## BASIC PLOTS ######
 
-load(file.path(dat.folder, "Bonusdata_20131103.RData"))
+library(ggplot2)
+library(RColorBrewer)
+library(gridExtra)
 
-# Plot data by shop category and time
-p <- ggplot(dat, aes(x=Date, y=ShopCategory, size=Value, colour=ShopCategory)) + geom_point(position=position_jitter(width=0, height=0.2)) + scale_size_continuous(range=c(2, 10))
-ggsave(p, width=8, height=6, file=file.path(dat.folder, "Bonusdata_ShopCategory-Time_20131103.png"))
+load(file.path(dat.folder, "Bonusdata_20131103.RData"))
 
 # Define common scales for all plot
 y.scale <- scale_y_continuous(limits=c(0, max(dat$CumValue)))
@@ -346,10 +334,20 @@ alpha.scale <- scale_alpha_continuous(limits=c(0.0, 1), range=c(0, 1))
 
 dat.init <- data.frame(Date=dat$Date[1], ShopCategory=factor(levels(dat$ShopCategory), levels=levels(dat$ShopCategory)), Value=0.01, CumValue=0.01, Lon=NA, Lat=NA)
 
+# Plot data by shop category and time
+# p <- ggplot(dat, aes(x=Date, y=ShopCategory, size=Value, colour=ShopCategory)) + geom_point(position=position_jitter(width=0, height=0.2)) + scale_size_continuous(range=c(2, 10))
+p <- ggplot(dat, aes(x=Date, y=ShopCategory, size=Value, colour=ShopCategory)) + geom_point(position=position_jitter(width=0, height=0.2)) + size.scale + col.scale
+ggsave(p, width=8, height=6, file=file.path(dat.folder, "Bonusdata_ShopCategory-Time_20131103.png"))
+
+
 p.cum.test <- ggplot(dat.init, aes(x=ShopCategory, fill=ShopCategory)) + geom_bar(aes(weight=Value)) + geom_bar(data=dat, aes(weight=Value)) + y.scale + fill.scale + theme(legend.position="top")
 
 
 ## MAP PLOTS #######
+
+library(ggmap)
+library(sorvi)
+theme_set(GetThemeMap())
 
 ## Map for Helsinki region
 Hel.bbox <- c(24.6, 60.12, 25.1, 60.32)
@@ -373,6 +371,11 @@ save.image(file.path(dat.folder, "bonusdata_image_20131103.RData"))
 
 
 ## SONIFICATION #######
+
+# Package for sonification
+library(playitbyr)
+# Using csound 5.2
+setCsoundLibrary("/Library/Frameworks/CsoundLib.framework/Versions/Current/lib_csnd.dylib")
 
 # Load data so far
 load(file.path(dat.folder, "bonusdata_image_20131103.RData"))
@@ -401,37 +404,11 @@ son <- sonify(dat, sonaes(time = TimeInd, pitch = GroupVal))
 son <- son + shape_scatter(mod=1, indx=3) + scale_time_continuous(c(0, maxTime)) + scale_pitch_continuous(c(8,8+4/12))
 sonsave(what=son, where=file.path(dat.folder, "animations/bonusdata_audio_V4_20131103.wav"))
 
-# # Sonify
-# son <- sonify(dat, sonaes(time = TimeInd, pitch = ValueCut, mod = ValueCut, indx = ValueCut)) 
-# son <- son + shape_scatter() + scale_time_continuous(c(0, maxTime)) + scale_pitch_continuous(6 + c(0, length(val.breaks)-2)) 
-# sonsave(what=son, where=file.path(dat.folder, "animations/bonusdata_audio_V3_20131103.wav"))
-#print(son)
-
-
-
-
-# ## TEST SONIFICATION
-# dat.temp <- droplevels(dat[1:50,])
-# temp.span <- as.interval(dat.temp$Date - dat.temp$Date[1], dat.temp$Date[1],)
-# temp.days <- as.period(temp.span, unit="days")
-# maxTime <- temp.days[length(temp.days)]@day/fps
-# dat.temp$TimeInd <- temp.days@day
-# dat.temp$GroupVal <- as.numeric(dat.temp$Group)
-# dat.temp$ValueInvert <- max(dat.temp$Value) - dat.temp$Value# + 100
-# # Cut values
-# Ncuts <- 5
-# dat.temp$ValueCut <- as.numeric(cut(dat.temp$Value, breaks=Ncuts)) 
-# son <- sonify(dat.temp, sonaes(time = TimeInd, pitch = ValueCut, mod = ValueCut, indx = ValueCut)) 
-# son <- son + shape_scatter() + scale_time_continuous(c(0, maxTime)) + scale_pitch_continuous(7 + c(0, Ncuts-1)) 
-# sonsave(what=son, where=file.path(dat.folder, "animations/bonusdata_audio_V4_temp_20131103.wav"))
-# son <- sonify(dat.temp, sonaes(time = TimeInd, pitch = GroupVal)) 
-# son <- son + shape_scatter(mod=1, indx=3) + scale_time_continuous(c(0, maxTime)) + scale_pitch_continuous(c(8,8+4/12))
-# sonsave(what=son, where=file.path(dat.folder, "animations/bonusdata_audio_V4_temp_20131103.wav"))
-
-
-
 
 ## ANIMATION ##########
+
+# Package for animation
+library(animation)
 
 # Animation options
 ani.options(outdir=paste0(dat.folder, "animations"),
@@ -478,7 +455,6 @@ saveVideo({
     print(p2)
   }
 }, video.name="bonusdata_video_V4_20131103.mp4", clean=TRUE, other.opts = "-b:a 300k")
-
 
 
 ## COMBINE AUDIO + VIDEO ############
