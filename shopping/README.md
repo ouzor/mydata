@@ -1,5 +1,8 @@
 # Shopping data
 
+## Page being updated during 3.11.2013!!!
+
+
 ## How to get my shopping data?
 
 S-group: Fill in a form in a customer service desk.
