@@ -17,8 +17,8 @@ Some news about the data [here](http://www.taloussanomat.fi/yrittaja/2012/10/31/
 
 In short, you need to
 * Scan your data 
-* Use some [Optical character recognition](http://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) tool to convert scanned data into a machine readable format. 
-* Process and analyse the converted data.
+* Use some [Optical character recognition](http://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) tool to convert scanned data into a machine readable format
+* Process and analyse the converted data
 
 Here's an example workflow that worked for me
 * Scan your data into a PDF
@@ -26,10 +26,11 @@ Here's an example workflow that worked for me
   * Tesseract shell scripts: [S-data](S-data_OCR.sh), [K-data] (coming)
 * Use [R](http://www.r-project.org/) for processing and analysing the data
   * R scripts: [S-data](S-data_process.R), K-data (coming)
+* More details in the end of this page!
 
-See the [video animation](http://ouzo.kuvat.fi/kuvat/Videos/Kanta-asiakkuuden+j%C3%A4ljet/).
+See the [video animation](http://ouzo.kuvat.fi/kuvat/Videos/Kanta-asiakkuuden+j%C3%A4ljet/)!
 
-Here are also some visualizations of the data. 
+Here are also some visualizations of the data:
 
 ![fig1](https://raw.github.com/ouzor/mydata/master/shopping/Bonusdata_ShopCategory-Time.png)
 
