@@ -335,8 +335,7 @@ alpha.scale <- scale_alpha_continuous(limits=c(0.0, 1), range=c(0, 1))
 dat.init <- data.frame(Date=dat$Date[1], ShopCategory=factor(levels(dat$ShopCategory), levels=levels(dat$ShopCategory)), Value=0.01, CumValue=0.01, Lon=NA, Lat=NA)
 
 # Plot data by shop category and time
-# p <- ggplot(dat, aes(x=Date, y=ShopCategory, size=Value, colour=ShopCategory)) + geom_point(position=position_jitter(width=0, height=0.2)) + scale_size_continuous(range=c(2, 10))
-p <- ggplot(dat, aes(x=Date, y=ShopCategory, size=Value, colour=ShopCategory)) + geom_point(position=position_jitter(width=0, height=0.2)) + size.scale + col.scale
+p <- ggplot(dat, aes(x=Date, y=ShopCategory, size=Value, colour=ShopCategory)) + geom_point(position=position_jitter(width=0, height=0.2)) + scale_size_continuous(range=c(2, 10)) + col.scale
 ggsave(p, width=8, height=6, file=file.path(dat.folder, "Bonusdata_ShopCategory-Time_20131103.png"))
 
 
