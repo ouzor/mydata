@@ -5,8 +5,8 @@ echo "Note! The scripts outputs a lot of warnings, but worked fine anyway for me
 
 for i in {1..31}
 do
-%	pdftk S-data.pdf cat $i output S-data_processed/S-data_split_$i.pdf
-%	convert -quiet -density 600 -size 210 × 297 -depth 8 S-data_processed/S-data_split_$i.pdf	S-data_processed/S-data_split_$i.png
+	pdftk S-data.pdf cat $i output S-data_processed/S-data_split_$i.pdf
+	convert -quiet -density 600 -size 210 × 297 -depth 8 S-data_processed/S-data_split_$i.pdf	S-data_processed/S-data_split_$i.png
  	tesseract S-data_processed/S-data_split_$i.png -l fin S-data_processed/S-data_split_$i
 done
 
