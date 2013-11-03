@@ -1,7 +1,6 @@
 # Shopping data
 
-## Page being updated during 3.11.2013!!!
-
+See the video animation [Kanta-asiakkuuden jäljet](http://ouzo.kuvat.fi/kuvat/Videos/Kanta-asiakkuuden+j%C3%A4ljet/)!
 
 ## How to get my shopping data?
 
