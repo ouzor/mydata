@@ -1,6 +1,6 @@
 # Shopping data
 
-See the video animation [Kanta-asiakkuuden jäljet](http://ouzo.kuvat.fi/kuvat/Videos/Kanta-asiakkuuden+j%C3%A4ljet/)!
+### Watch first the video animation [Kanta-asiakkuuden jäljet](http://ouzo.kuvat.fi/kuvat/Videos/Kanta-asiakkuuden+j%C3%A4ljet/)!
 
 ## How to get my shopping data?
 
