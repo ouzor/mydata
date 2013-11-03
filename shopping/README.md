@@ -23,12 +23,12 @@ In short, you need to
 Here's an example workflow that worked for me
 * Scan your data into a PDF
 * Use [Tesseract](https://code.google.com/p/tesseract-ocr/) for OCR
-  * Tesseract shell scripts: [S-data](S-data_OCR.sh), [K-data] (coming)
+  * Tesseract shell scripts: [S-data](S-data_OCR.sh), [K-data](K-data_OCR.sh)
 * Use [R](http://www.r-project.org/) for processing and analysing the data
-  * R scripts: [S-data](S-data_process.R), K-data (coming)
+  * [R script](bonusdata_process.R)
 * More details in the end of this page!
 
-See the [video animation](http://ouzo.kuvat.fi/kuvat/Videos/Kanta-asiakkuuden+j%C3%A4ljet/)!
+See the video animation [Kanta-asiakkuuden jäljet](http://ouzo.kuvat.fi/kuvat/Videos/Kanta-asiakkuuden+j%C3%A4ljet/)!
 
 Here are also some visualizations of the data:
 
