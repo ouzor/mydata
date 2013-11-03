@@ -23,18 +23,26 @@ In short, you need to
 Here's an example workflow that worked for me
 * Scan your data into a PDF
 * Use [Tesseract](https://code.google.com/p/tesseract-ocr/) for OCR
-  * Tesseract shell scripts: [S-data](S-data_OCR.sh), K-data (coming)
+  * Tesseract shell scripts: [S-data](S-data_OCR.sh), [K-data] (coming)
 * Use [R](http://www.r-project.org/) for processing and analysing the data
   * R scripts: [S-data](S-data_process.R), K-data (coming)
-  
-Here's and example visualization, produced from my S-data with the above script
 
-![S-data_vis](https://raw.github.com/ouzor/mydata/master/shopping/S-data_Events_20130526.png)
+See the [video animation](http://ouzo.kuvat.fi/kuvat/Videos/Kanta-asiakkuuden+j%C3%A4ljet/).
 
-## Some details
+Here are also some visualizations of the data. 
 
-### Tesseract installation on OS X
+![fig1](https://raw.github.com/ouzor/mydata/master/shopping/Bonusdata_ShopCategory-Time.png)
+
+![fig2](https://raw.github.com/ouzor/mydata/master/shopping/Bonusdata_Helsinkimap.png)
+
+## More details of the tools used
+
+### Tesseract
 
 * Useful instructions [here](http://blog.bobkuo.com/2011/02/installing-and-using-tesseract-2-04-on-mac-os-x-10-6-6-with-homebrew/)
 * Additionally, the [Finnish language pack](https://code.google.com/p/tesseract-ocr/downloads/detail?name=tesseract-ocr-3.02.fin.tar.gz&can=2&q=) is needed
 * This [blog post](http://elmargol.wordpress.com/2011/01/27/howto-scan-multiple-pages-to-a-pdf-file-and-ocr-using-tesseract-on-archlinux/) was helpful for getting started with Tesseract
+
+### Data sonification
+
+* coming
