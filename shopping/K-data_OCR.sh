@@ -1,4 +1,15 @@
 #!/bin/bash
+# Copyright (C) 2013 Juuso Parkkinen.
+# Contact: <juuso.parkkinen@iki.fi>. 
+# All rights reserved.
+
+# This program is open source software; you can redistribute it and/or modify
+# it under the terms of the FreeBSD License (keep this notice):
+# http://en.wikipedia.org/wiki/BSD_licenses
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 echo "K-data: split, convert pdfs to png"
 for i in {1..12}
