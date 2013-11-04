@@ -37,6 +37,8 @@ Here are also some visualizations of the data:
 
 ## More details of the tools used
 
+Some tips and details of installing and using the tools on OSX 1.8.5.
+
 ### OCR with Tesseract
 
 Installation
