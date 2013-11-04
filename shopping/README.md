@@ -46,13 +46,13 @@ Installation
 * This [blog post](http://elmargol.wordpress.com/2011/01/27/howto-scan-multiple-pages-to-a-pdf-file-and-ocr-using-tesseract-on-archlinux/) was helpful for getting started with Tesseract
 
 Running OCR
-* If data is given in a table format with borders, OCR will be in trouble. There might be some option for Tesseract to adapt to this, but at least I didn't find anything. So I ended up removing the horizontal lines in R, which was not trivial since the lines were not exactly horizontal but a bit tilted instead.
+* If data is given in a table format with borders, OCR will be in trouble. There might be some option for Tesseract to adapt to this, but at least I didn't find anything. So I ended up removing the horizontal lines in R, which was not trivial since the lines were not exactly horizontal but a bit tilted instead
 * It would have also been useful too add custom vocabulary such as "supermarket", but I did not get this to work with Tesseract (some hints [here](http://code.google.com/p/tesseract-ocr/wiki/FAQ#How_do_I_unpack_or_alter_existing_language_data_files?))
 
 ### Animation
 
 * Used R package [animation](http://cran.r-project.org/web/packages/animation/index.html)
-* Needs [ffmpeg](http://www.renevolution.com/how-to-install-ffmpeg-on-mac-os-x/). 
+* Needs [ffmpeg](http://www.renevolution.com/how-to-install-ffmpeg-on-mac-os-x/)
 * Needed to also install [otool](http://apple.stackexchange.com/questions/58057/is-otool-removed-in-mountain-lion)
 
 ### Data sonification
