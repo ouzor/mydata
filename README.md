@@ -8,6 +8,7 @@ Currently available scripts
 * [Scoopinion reading data](scoopinion)
 
 Other mydata sources on my todo list
+* Social network data from Facebook, Twitter, LinkedIn, emails
 * [Heiaheia](http://www.heiaheia.com/) exercise data
 * [Taltioni](http://www.taltioni.fi/fi) healthcare data
 * [HSL Matkakortti](https://omamatkakortti.hsl.fi/) data
